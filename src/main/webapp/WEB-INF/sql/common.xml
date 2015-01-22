@@ -1,0 +1,1111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common">
+	<resultMap id="commonCode" type="himart.mobile.admin.vo.CommonCodeVO">
+		<result property="seq" column="SEQ" />
+		<result property="itemCd1" column="ITEM_CD_1" />
+		<result property="itemCd2" column="ITEM_CD_2" />
+		<result property="itemNm1" column="ITEM_NM_1" />
+		<result property="itemNm2" column="ITEM_NM_2" />
+	</resultMap>
+
+	<!-- 품목총수조회 -->
+	<select id="selectItemTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM  SC010C
+		 WHERE  1 = 1
+		   AND  ITEM_CD LIKE 'D%'
+		   AND  CLS_LV = '2'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+		   AND  USE_YN = '1'
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+		   AND  ITEM_ID LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+		   AND  ITEM_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	</select>
+
+	<!-- 품목목록조회 -->
+	<select id="selectItemList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+		<![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+   		]]>
+		</if>
+		<![CDATA[
+						SELECT  ITEM_CD AS ITEM_CD_1
+						      , ITEM_CD AS ITEM_CD_2
+						      , ITEM_NM AS ITEM_NM_1
+						      , ITEM_NM AS ITEM_NM_2
+						  FROM  SC010C
+						 WHERE  1 = 1
+                           AND  ITEM_CD LIKE 'D%'
+						   AND  CLS_LV = '2'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+						   AND  USE_YN = '1'
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  ITEM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  ITEM_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+    <!-- 닉네임총수조회 -->
+    <select id="selectNicTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+        <if test='allowAll == "Y"'>
+        <![CDATA[
+        SELECT  COUNT(*) + 1
+        ]]>
+        </if>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+        SELECT  COUNT(*)
+        ]]>
+        </if>
+        <![CDATA[
+          FROM (
+                SELECT  A.STPN_CD
+                      , A.STPN_NM
+                  FROM  RM470M A
+                      , RM471T B
+                      ,(
+                        SELECT  A.PRD_ID
+                          FROM  SC011M A
+                              , SC010C B
+                         WHERE  A.ITEM_ID = B.ITEM_ID
+                           AND  B.CLS_LV = '5'
+                           AND  B.ITEM_CD LIKE #{schUpCd}||'%'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  B.USE_YN = '1'
+        ]]>
+        </if>
+        <![CDATA[
+                       ) C
+                 WHERE  A.STPN_CD = B.STPN_CD
+                   AND  A.UP_STPN_CD = 'AF'
+                   AND  B.PRD_ID = C.PRD_ID
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                   AND  A.STPN_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                   AND  A.STPN_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <![CDATA[
+                 GROUP  BY A.STPN_CD
+                         , A.STPN_NM
+               )
+         WHERE  1 = 1
+        ]]>
+    </select>
+
+    <!-- 닉네임목록조회 -->
+    <select id="selectNicList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+        <![CDATA[
+        SELECT  *
+          FROM (
+                SELECT  ROWNUM AS SEQ
+                      , A.*
+                      , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+                  FROM (
+        ]]>
+        <if test='allowAll == "Y"'>
+        <![CDATA[
+                        SELECT  NULL AS ITEM_CD_1
+                              , NULL AS ITEM_CD_2
+                              , NULL AS ITEM_NM_1
+                              , '전체' AS ITEM_NM_2
+                          FROM  DUAL
+                         UNION  ALL
+        ]]>
+        </if>
+        <![CDATA[
+                        SELECT  A.STPN_CD AS ITEM_CD_1
+                              , A.STPN_CD AS ITEM_CD_2
+                              , A.STPN_NM AS ITEM_NM_1
+                              , A.STPN_NM AS ITEM_NM_2
+                          FROM  RM470M A
+                              , RM471T B
+                              ,(
+                                SELECT  A.PRD_ID
+                                  FROM  SC011M A
+                                      , SC010C B
+                                 WHERE  A.ITEM_ID = B.ITEM_ID
+                                   AND  B.CLS_LV = '5'
+                                   AND  B.ITEM_CD LIKE #{schUpCd}||'%'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                                   AND  B.USE_YN = '1'
+        ]]>
+        </if>
+        <![CDATA[
+                               ) C
+                         WHERE  A.STPN_CD = B.STPN_CD
+                           AND  A.UP_STPN_CD = 'AF'
+                           AND  B.PRD_ID = C.PRD_ID
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                           AND  A.STPN_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                           AND  A.STPN_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <![CDATA[
+                         GROUP  BY A.STPN_CD
+                                 , A.STPN_NM
+                         ORDER  BY ITEM_CD_2 NULLS FIRST
+                       ) A
+                )
+          WHERE  PAGE = #{pageNo}
+        ]]>
+    </select>
+
+    
+    <!-- 대표코드총수조회 -->
+    <select id="selectMstTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+        <if test='allowAll == "Y"'>
+        <![CDATA[
+        SELECT  COUNT(*) + 1
+        ]]>
+        </if>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+        SELECT  COUNT(*)
+        ]]>
+        </if>
+        <![CDATA[
+          FROM (
+                SELECT  A.STPN_CD
+                      , A.STPN_NM
+                  FROM  RM470M A
+                      , RM471T B
+                      ,(
+                        SELECT  A.PRD_ID
+                          FROM  SC011M A
+                              , SC010C B
+                         WHERE  A.ITEM_ID = B.ITEM_ID
+                           AND  B.CLS_LV = '5'
+                           AND  B.ITEM_CD LIKE #{schUpCd}||'%'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  B.USE_YN = '1'
+        ]]>
+        </if>
+        <![CDATA[
+                       ) C
+                 WHERE  A.STPN_CD = B.STPN_CD
+                   AND  A.UP_STPN_CD = 'AA'
+                   AND  B.PRD_ID = C.PRD_ID
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                   AND  A.STPN_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                   AND  A.STPN_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <![CDATA[
+                 GROUP  BY A.STPN_CD
+                         , A.STPN_NM
+               )
+         WHERE  1 = 1
+        ]]>
+    </select>
+
+    <!-- 대표목록조회 -->
+    <select id="selectMstList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+        <![CDATA[
+        SELECT  *
+          FROM (
+                SELECT  ROWNUM AS SEQ
+                      , A.*
+                      , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+                  FROM (
+        ]]>
+        <if test='allowAll == "Y"'>
+        <![CDATA[
+                        SELECT  NULL AS ITEM_CD_1
+                              , NULL AS ITEM_CD_2
+                              , NULL AS ITEM_NM_1
+                              , '전체' AS ITEM_NM_2
+                          FROM  DUAL
+                         UNION  ALL
+        ]]>
+        </if>
+        <![CDATA[
+                        SELECT  A.STPN_CD AS ITEM_CD_1
+                              , A.STPN_CD AS ITEM_CD_2
+                              , A.STPN_NM AS ITEM_NM_1
+                              , A.STPN_NM AS ITEM_NM_2
+                          FROM  RM470M A
+                              , RM471T B
+                              ,(
+                                SELECT  A.PRD_ID
+                                  FROM  SC011M A
+                                      , SC010C B
+                                 WHERE  A.ITEM_ID = B.ITEM_ID
+                                   AND  B.CLS_LV = '5'
+                                   AND  B.ITEM_CD LIKE #{schUpCd}||'%'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                                   AND  B.USE_YN = '1'
+        ]]>
+        </if>
+        <![CDATA[
+                               ) C
+                         WHERE  A.STPN_CD = B.STPN_CD
+                           AND  A.UP_STPN_CD = 'AA'
+                           AND  B.PRD_ID = C.PRD_ID
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                           AND  A.STPN_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                           AND  A.STPN_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <![CDATA[
+                         GROUP  BY A.STPN_CD
+                                 , A.STPN_NM
+                         ORDER  BY ITEM_CD_2 NULLS FIRST
+                       ) A
+                )
+          WHERE  PAGE = #{pageNo}
+        ]]>
+    </select>
+    
+    <!-- 액세서리총수조회 -->
+    <select id="selectAccTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+        <if test='allowAll == "Y"'>
+        <![CDATA[
+        SELECT  COUNT(*) + 1
+        ]]>
+        </if>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+        SELECT  COUNT(*)
+        ]]>
+        </if>
+        <![CDATA[
+          FROM (
+                SELECT  A.PRD_ID
+                      , B.PRD_CD
+                      , B.PRD_NM
+                  FROM  RM476T A
+                      , SC011M B
+                 WHERE  A.PRD_ID = B.PRD_ID
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                   AND  A.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+        <![CDATA[
+                   AND  A.STPN_CD = #{schUpCd}
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                   AND  B.PRD_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                   AND  B.PRD_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <![CDATA[
+                 GROUP  BY A.PRD_ID
+                         , B.PRD_CD
+                         , B.PRD_NM
+               )
+         WHERE  1 = 1
+        ]]>
+    </select>
+
+    <!-- 액세서리목록조회 -->
+    <select id="selectAccList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+        <![CDATA[
+        SELECT  *
+          FROM (
+                SELECT  ROWNUM AS SEQ
+                      , A.*
+                      , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+                  FROM (
+        ]]>
+        <if test='allowAll == "Y"'>
+        <![CDATA[
+                        SELECT  NULL AS ITEM_CD_1
+                              , NULL AS ITEM_CD_2
+                              , NULL AS ITEM_NM_1
+                              , '전체' AS ITEM_NM_2
+                          FROM  DUAL
+                         UNION  ALL
+        ]]>
+        </if>
+        <![CDATA[
+                        SELECT  A.PRD_ID AS ITEM_CD_1
+                              , B.PRD_CD AS ITEM_CD_2
+                              , B.PRD_CD AS ITEM_NM_1
+                              , B.PRD_NM AS ITEM_NM_2
+                          FROM  RM476T A
+                              , SC011M B
+                         WHERE  A.PRD_ID = B.PRD_ID
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  A.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+        <![CDATA[
+                           AND  A.STPN_CD = #{schUpCd}
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                           AND  B.PRD_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                           AND  B.PRD_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <![CDATA[
+                         GROUP  BY A.PRD_ID
+                                 , B.PRD_CD
+                                 , B.PRD_NM
+                         ORDER  BY ITEM_CD_2 NULLS FIRST
+                       ) A
+                )
+          WHERE  PAGE = #{pageNo}
+        ]]>
+    </select>
+
+	<!-- 카드할인총수조회 -->
+	<select id="selectCardTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+		<![CDATA[
+		SELECT  COUNT(*) + 1
+		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+		<![CDATA[
+		SELECT  COUNT(*)
+		]]>
+		</if>
+	    <![CDATA[
+		  FROM (
+				SELECT  CM_CD AS ITEM_CD_1
+				      , CM_CD AS ITEM_CD_2
+				      , CM_CD_NM AS ITEM_NM_1
+				      , CM_CD_NM AS ITEM_NM_2
+				  FROM  CM401C
+				 WHERE  CM_CLS_CD = 'RM0244'
+		]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                   AND  EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+				   AND  CM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+				   AND  CM_CD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<![CDATA[
+		       )
+		 WHERE  1 = 1
+		]]>
+	</select>
+
+	<!-- 카드할인목록조회 -->
+	<select id="selectCardList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+		<![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+   		]]>
+		</if>
+		<![CDATA[
+						SELECT  CM_CD AS ITEM_CD_1
+						      , CM_CD AS ITEM_CD_2
+						      , CM_CD_NM AS ITEM_NM_1
+						      , CM_CD_NM AS ITEM_NM_2
+						  FROM  CM401C
+						 WHERE  CM_CLS_CD = 'RM0244'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  CM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  CM_CD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<!-- 이미지구분총수조회 -->
+	<select id="selectImgGbTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM (
+				SELECT  CM_CD AS ITEM_CD_1
+				      , CM_CD AS ITEM_CD_2
+				      , CM_CD_NM AS ITEM_NM_1
+				      , CM_CD_NM AS ITEM_NM_2
+				  FROM  CM401C
+				 WHERE  CM_CLS_CD = 'RM0247'
+        ]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                   AND  EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+				   AND  CM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+				   AND  CM_CD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+		       )
+		 WHERE  1 = 1
+		]]>
+	</select>
+
+	<!-- 이미지구분목록조회 -->
+	<select id="selectImgGbList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+		]]>
+		</if>
+		<![CDATA[
+						SELECT  CM_CD AS ITEM_CD_1
+						      , CM_CD AS ITEM_CD_2
+						      , CM_CD_NM AS ITEM_NM_1
+						      , CM_CD_NM AS ITEM_NM_2
+						  FROM  CM401C
+						 WHERE  CM_CLS_CD = 'RM0247'
+   		]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  CM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  CM_CD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<!-- 지점 총수조회 -->
+	<select id="selectBrchTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM  VCO_ORGINFO
+		 WHERE  ORG_TYPE = 'C1'
+   		]]>
+		<if test='schGb == "C"'>
+		<![CDATA[
+		   AND  ORG_NO LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+		   AND  ORG_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	</select>
+
+	<!-- 지점 목록조회 -->
+	<select id="selectBrchList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+		<![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+   		]]>
+		</if>
+		<![CDATA[
+						SELECT  ORG_NO AS ITEM_CD_1
+						      , ORG_NO AS ITEM_CD_2
+						      , ORG_NM AS ITEM_NM_1
+						      , ORG_NM AS ITEM_NM_2
+						  FROM  VCO_ORGINFO
+						 WHERE  ORG_TYPE = 'C1'
+   		]]>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  ORG_NO LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  ORG_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<!-- 제조사 총수조회 -->
+	<select id="selectMkrTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM  CM101C
+		 WHERE  VNDR_ID IN ('10127563', '10127564', '10127565', '10127566', '11372709', '11528251')
+   		]]>
+		<if test='schGb == "C"'>
+		<![CDATA[
+		   AND  VNDR_ID LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+		   AND  VNDR_ABB_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	</select>
+
+	<!-- 제조사 목록조회 -->
+	<select id="selectMkrList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+   		]]>
+		</if>
+		<![CDATA[
+						SELECT  VNDR_ID AS ITEM_CD_1
+						      , VNDR_ID AS ITEM_CD_2
+						      , DECODE(VNDR_ID, '10127566', '팬택', VNDR_ABB_NM) AS ITEM_NM_1
+						      , DECODE(VNDR_ID, '10127566', '팬택', VNDR_ABB_NM) AS ITEM_NM_2
+						  FROM  CM101C
+						 WHERE  VNDR_ID IN ('10127563', '10127564', '10127565', '10127566', '11372709', '11528251')
+   		]]>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  VNDR_ID LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  VNDR_ABB_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<!-- 모델코드 총수조회 -->
+	<select id="selectPrdCdTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM  SC011M A
+		      , SC010C B
+		 WHERE  A.ITEM_ID = B.ITEM_ID
+		   AND  B.CLS_LV = '5'
+		   AND  B.ITEM_CD LIKE 'D%'
+		   AND  A.MKR_CLS_CD IN ('01','02', '03', '04')
+		   AND  A.DCTN_DT IS NULL
+		   AND  A.MKR_ID = #{schUpCd}
+   		]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+           AND  B.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+		   AND  A.PRD_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+		   AND  A.PRD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	</select>
+
+	<!-- 모델코드 목록조회 -->
+	<select id="selectPrdCdList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+   		]]>
+		</if>
+		<![CDATA[
+						SELECT  A.PRD_CD AS ITEM_CD_1
+						      , A.PRD_CD AS ITEM_CD_2
+						      , A.PRD_NM AS ITEM_NM_1
+						      , A.PRD_NM AS ITEM_NM_2
+						  FROM  SC011M A
+						      , SC010C B
+						 WHERE  A.ITEM_ID = B.ITEM_ID
+						   AND  B.CLS_LV = '5'
+						   AND  B.ITEM_CD LIKE 'D%'
+						   AND  A.MKR_CLS_CD IN ('01','02', '03', '04')
+						   AND  A.DCTN_DT IS NULL
+						   AND  A.MKR_ID = #{schUpCd}
+   		]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  B.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  A.PRD_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  A.PRD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<!-- 통신사 총수조회 -->
+	<select id="selectMbcomTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM (
+				SELECT  CM_CD AS ITEM_CD_1
+				      , CM_CD AS ITEM_CD_2
+				      , CM_CD_NM AS ITEM_NM_1
+				      , CM_CD_NM AS ITEM_NM_2
+				  FROM  CM401C
+				 WHERE  CM_CLS_CD = 'RM0104'
+		]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                   AND  EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+				   AND  CM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+				   AND  CM_CD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+		       )
+		 WHERE  1 = 1
+		]]>
+	</select>
+
+	<!-- 통신사 목록조회 -->
+	<select id="selectMbcomList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+		]]>
+		</if>
+		<![CDATA[
+						SELECT  CM_CD AS ITEM_CD_1
+						      , CM_CD AS ITEM_CD_2
+						      , CM_CD_NM AS ITEM_NM_1
+						      , CM_CD_NM AS ITEM_NM_2
+						  FROM  CM401C
+						 WHERE  CM_CLS_CD = 'RM0104'
+   		]]>
+        <if test='allowAll != "Y"'>
+        <![CDATA[
+                           AND  EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+        ]]>
+        </if>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  CM_CD LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  CM_CD_NM LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<!-- 사원 총수조회 -->
+	<select id="selectEmpTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*) + 1
+   		]]>
+		</if>
+		<if test='allowAll != "Y"'>
+	    <![CDATA[
+		SELECT  COUNT(*)
+   		]]>
+		</if>
+	    <![CDATA[
+		  FROM  VCO_USERINFO
+		 WHERE  ORG_TYPE = 'C1'
+		   AND  BLONG_ORG_NO = #{schUpCd}
+   		]]>
+		<if test='schGb == "C"'>
+		<![CDATA[
+		   AND  EMP_NO LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+		   AND  EMP_KNAME LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	</select>
+
+	<!-- 사원 목록조회 -->
+	<select id="selectEmpList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  ROWNUM AS SEQ
+		              , A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (
+   		]]>
+		<if test='allowAll == "Y"'>
+	    <![CDATA[
+						SELECT  NULL AS ITEM_CD_1
+						      , NULL AS ITEM_CD_2
+						      , NULL AS ITEM_NM_1
+						      , '전체' AS ITEM_NM_2
+						  FROM  DUAL
+                         UNION  ALL
+   		]]>
+		</if>
+		<![CDATA[
+						SELECT  EMP_NO AS ITEM_CD_1
+						      , EMP_NO AS ITEM_CD_2
+						      , EMP_KNAME AS ITEM_NM_1
+						      , EMP_KNAME AS ITEM_NM_2
+						  FROM  VCO_USERINFO
+						 WHERE  ORG_TYPE = 'C1'
+						   AND  BLONG_ORG_NO = #{schUpCd}
+   		]]>
+		<if test='schGb == "C"'>
+		<![CDATA[
+						   AND  EMP_NO LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+		<if test='schGb == "N"'>
+		<![CDATA[
+						   AND  EMP_KNAME LIKE '%' || #{schStr} || '%'
+		]]>
+		</if>
+	    <![CDATA[
+						 ORDER  BY ITEM_CD_2 NULLS FIRST
+				       ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+	
+	<!-- 코드, 코드명 총수조회 -->
+    <select id="selectCodeTotCount" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultType="java.lang.Integer">
+        <![CDATA[
+        SELECT  COUNT(*)
+			  FROM RM470M A
+			 WHERE    A.STPN_CD LIKE 'AP%'
+			       AND A.UP_STPN_CD = 'AP'
+			       AND A.EFF_END_DT = '99991231'
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                   AND   A.STPN_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                   AND  A.STPN_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+    </select>
+
+    <!--  코드, 코드명 목록조회 -->
+    <select id="selectCodeList" parameterType="himart.mobile.admin.vo.CommonCodeVO" resultMap="commonCode">
+        <![CDATA[
+        SELECT  *
+          FROM (
+                SELECT  ROWNUM AS SEQ
+                      , A.*
+                      , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+                  FROM (
+        ]]>
+  
+        <![CDATA[
+               SELECT  A.STPN_CD AS ITEM_CD_1
+                    , A.STPN_CD AS ITEM_CD_2
+                    , A.STPN_NM AS ITEM_NM_1
+                    , A.STPN_NM AS ITEM_NM_2
+			  FROM RM470M A
+			 WHERE     STPN_CD LIKE 'AP%'
+			       AND UP_STPN_CD = 'AP'
+			       AND EFF_END_DT = '99991231'
+        ]]>
+        <if test='schGb == "C"'>
+        <![CDATA[
+                    AND  A.STPN_CD LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+        <if test='schGb == "N"'>
+        <![CDATA[
+                  AND  A.STPN_NM LIKE '%' || #{schStr} || '%'
+        ]]>
+        </if>
+       <![CDATA[
+                 GROUP  BY A.STPN_CD
+                         , A.STPN_NM
+                 ORDER  BY ITEM_CD_1  NULLS FIRST
+                       ) A
+                )
+          WHERE  PAGE = #{pageNo}
+        ]]>
+    </select>
+	 
+</mapper>

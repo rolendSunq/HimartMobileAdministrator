@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="recom">
+    <resultMap id="recomHoffice" type="himart.mobile.admin.vo.RecomHofficeVO">
+        <result property="seq" column="SEQ" />
+        <result property="regDt" column="REG_DT" />
+        <result property="mkrPrdCd" column="MKR_PRD_CD" />
+        <result property="mbComCd" column="MBCOM_CD" />
+        <result property="mbComCdNm" column="MBCOM_CD_NM" />
+        <result property="mobJnCfCd" column="MOB_JN_CF_CD" />
+        <result property="mobJnCfCdNm" column="MOB_JN_CF_CD_NM" />
+        <result property="stpnCd" column="STPN_CD" />
+        <result property="stpnCdNm" column="STPN_CD_NM" />
+        <result property="salePrc" column="SALE_PRC" />
+        <result property="imgOrigFileNm" column="IMG_ORIG_FILE_NM" />
+        <result property="imgSaveFileNm" column="IMG_SAVE_FILE_NM" />
+        <result property="imgSavePath" column="IMG_SAVE_PATH" />
+    </resultMap>
+
+    <resultMap id="salePriceBoard" type="himart.mobile.admin.vo.SalePriceBoardVO">
+      <result property="nicCd" column="STPN_CD" />
+      <result property="nicCdNm" column="STPN_NM" />
+      <result property="mkrPrdCd" column="MKR_PRD_CD" />
+      <result property="shoPrc" column="SHO_PRC" />
+      <result property="clpnCd" column="CLPN_CD" />
+      <result property="clpnCdNm" column="CLPN_CD_NM" />
+      <result property="salePrc11" column="SALE_PRC_11" />
+      <result property="salePrc16" column="SALE_PRC_16" />
+      <result property="salePrc17" column="SALE_PRC_17" />
+      <result property="salePrc19" column="SALE_PRC_19" />
+      <result property="salePrc22" column="SALE_PRC_22" />
+      <result property="salePrc24" column="SALE_PRC_24" />
+      <result property="salePrc25" column="SALE_PRC_25" />
+    </resultMap>
+
+    <select id="selectLastRegDate" resultType="java.lang.String">
+        <![CDATA[
+        SELECT MAX(REG_DT)
+          FROM RM478T
+         WHERE 1 = 1
+           AND ORG_ID = '0000000'
+        ]]>
+    </select>
+
+    <select id="selectRecomHofficeTotCount" parameterType="himart.mobile.admin.vo.RecomHofficeVO" resultType="java.lang.Integer">
+        <![CDATA[
+        SELECT  COUNT(*)
+          FROM  RM478T A
+         WHERE  1 = 1
+           AND  A.ORG_ID = '0000000'
+           AND  A.REG_DT = #{regDt}
+        ]]>
+    </select>
+
+    <select id="selectRecomHofficeList" parameterType="himart.mobile.admin.vo.RecomHofficeVO" resultMap="recomHoffice">
+        <![CDATA[
+        SELECT  *
+          FROM (
+                SELECT  A.*
+                      , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+                  FROM (   
+                        SELECT  A.SEQ
+                              , A.REG_DT
+                              , A.MKR_PRD_CD
+                              , A.MBCOM_CD
+                              , B.CM_CD_NM AS MBCOM_CD_NM
+                              , A.MOB_JN_CF_CD
+                              , C.CM_CD_NM AS MOB_JN_CF_CD_NM
+                              , A.STPN_CD
+                              , D.CLPN_NM AS STPN_CD_NM
+                              , A.SALE_PRC
+                              , A.IMG_ORIG_FILE_NM
+                              , A.IMG_SAVE_FILE_NM
+                              , A.IMG_SAVE_PATH
+                          FROM  RM478T A LEFT OUTER JOIN CM401C B
+                                                      ON B.CM_CLS_CD = 'RM0104'
+                                                     AND B.CM_CD = A.MBCOM_CD
+                                         LEFT OUTER JOIN CM401C C
+                                                      ON C.CM_CLS_CD = 'SCP1'
+                                                     AND C.CM_CD = A.MOB_JN_CF_CD
+                                         LEFT OUTER JOIN RM461M D
+                                                      ON D.MBCOM_CD = A.MBCOM_CD
+                                                     AND D.CLPN_CD = A.STPN_CD
+                         WHERE  1 = 1
+                           AND  A.ORG_ID = '0000000'
+                           AND  A.REG_DT = #{regDt}
+                         ORDER  BY A.SEQ ASC
+                       ) A
+                )
+          WHERE  PAGE = #{pageNo}
+        ]]>
+    </select>
+
+    <delete id="deleteRecomHoffice" parameterType="himart.mobile.admin.vo.RecomHofficeVO">
+        <![CDATA[
+        DELETE
+          FROM  RM478T
+         WHERE  ORG_ID = '0000000'
+           AND  REG_DT = #{regDt}
+           AND  SEQ IN
+         ]]>
+        <foreach item="item" index="index" collection="seqList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="updateRecomHoffice" parameterType="himart.mobile.admin.vo.RecomHofficeVO">
+        <![CDATA[
+        UPDATE  RM478T
+           SET  IMG_ORIG_FILE_NM = #{imgOrigFileNm}
+              , IMG_SAVE_FILE_NM = #{imgSaveFileNm}
+              , IMG_SAVE_PATH = #{imgSavePath}
+              , UPD_DTM = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+              , UPDR_ID = #{empNo}
+         WHERE  ORG_ID = '0000000'
+           AND  REG_DT = #{regDt}
+           AND  SEQ = #{seq}
+        ]]>
+    </update>
+
+    <select id="selectLastMobDgr" parameterType="himart.mobile.admin.vo.SalePriceBoardVO" resultType="java.lang.Integer">
+        <![CDATA[
+        SELECT  NVL(MAX(MOB_DGR), -1) AS MOB_DGR
+          FROM  SC017M
+         WHERE  SBD_TYPE_CD = '00'
+           AND  SALE_PRC > 0
+           AND  MOB_DGR NOT IN (99)
+           AND  MBCOM_CD = #{mbcomCd}
+        ]]>
+           <choose>
+           <when test='mbcomCd == "01"'>
+        <![CDATA[
+              AND  JN_CF_CD IN ('11', '16', '17', '19', '22', '24')
+        ]]>
+        </when>
+           <when test='mbcomCd == "02"'>
+        <![CDATA[
+              AND  JN_CF_CD IN ('11', '16', '19', '22', '24', '25')
+        ]]>
+        </when>
+           <when test='mbcomCd == "03"'>
+        <![CDATA[
+              AND  JN_CF_CD IN ('11', '16', '25')
+        ]]>
+        </when>
+           <when test='mbcomCd == "04"'>
+        <![CDATA[
+              AND  JN_CF_CD IN ('11', '24', '25')
+        ]]>
+            </when>
+            <otherwise>
+        <![CDATA[
+              AND  1 = 2
+        ]]>
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectSalePriceBoardTotCount" parameterType="himart.mobile.admin.vo.SalePriceBoardVO" resultType="java.lang.Integer">
+        <![CDATA[
+        SELECT  COUNT(*)
+          FROM (
+                SELECT  DISTINCT
+                        A.MOB_DGR
+                      , D.STPN_CD
+                      , D.STPN_NM
+                      , A.MKR_PRD_CD
+                      , E.SHO_PRC
+                      , F.STPN_CD AS CLPN_CD
+                      , (SELECT CLPN_NM FROM RM461M WHERE CLPN_CD = G.CLPN_CD) AS CLPN_CD_NM
+                      , A.SALE_PRC_11
+                      , A.SALE_PRC_16
+                      , A.SALE_PRC_17
+                      , A.SALE_PRC_19
+                      , A.SALE_PRC_22
+                      , A.SALE_PRC_24
+                      , A.SALE_PRC_25
+                  FROM (
+                        SELECT  A.MOB_DGR
+                              , A.MKR_PRD_CD
+                              , A.CLPN_CD
+                              , SUM(DECODE(A.JN_CF_CD, '11', A.SALE_PRC, 0)) AS SALE_PRC_11
+                              , SUM(DECODE(A.JN_CF_CD, '16', A.SALE_PRC, 0)) AS SALE_PRC_16
+                              , SUM(DECODE(A.JN_CF_CD, '17', A.SALE_PRC, 0)) AS SALE_PRC_17
+                              , SUM(DECODE(A.JN_CF_CD, '19', A.SALE_PRC, 0)) AS SALE_PRC_19
+                              , SUM(DECODE(A.JN_CF_CD, '22', A.SALE_PRC, 0)) AS SALE_PRC_22
+                              , SUM(DECODE(A.JN_CF_CD, '24', A.SALE_PRC, 0)) AS SALE_PRC_24
+                              , SUM(DECODE(A.JN_CF_CD, '25', A.SALE_PRC, 0)) AS SALE_PRC_25
+                          FROM  SC017M A
+                         WHERE  1 = 1
+                           AND  A.SBD_TYPE_CD = '00'
+                           AND  A.SALE_PRC > 0
+                           AND  A.MOB_DGR = #{mobDgr}
+                           AND  A.MBCOM_CD = #{mbcomCd}
+        ]]>
+           <choose>
+           <when test='mbcomCd == "01"'>
+        <![CDATA[
+                              AND  A.JN_CF_CD IN ('11', '16', '17', '19', '22', '24')
+        ]]>
+        </when>
+           <when test='mbcomCd == "02"'>
+        <![CDATA[
+                              AND  A.JN_CF_CD IN ('11', '16', '19', '22', '24', '25')
+        ]]>
+        </when>
+           <when test='mbcomCd == "03"'>
+        <![CDATA[
+                              AND  A.JN_CF_CD IN ('11', '16', '25')
+        ]]>
+        </when>
+           <when test='mbcomCd == "04"'>
+        <![CDATA[
+                               AND  A.JN_CF_CD IN ('11', '24', '25')
+        ]]>
+        </when>
+        <otherwise>
+        <![CDATA[
+                              AND  1 = 2
+        ]]>
+        </otherwise>
+           </choose>
+        <![CDATA[
+                         GROUP  BY A.MOB_DGR
+                                 , A.MKR_PRD_CD
+                                 , A.CLPN_CD
+                       ) A
+                         INNER JOIN SC011M B
+                            ON B.MKR_PRD_CD = A.MKR_PRD_CD
+                         INNER JOIN RM471T C
+                            ON C.STPN_SEQ NOT IN (15, 16)
+                           AND C.PRD_ID = B.PRD_ID
+                         INNER JOIN RM470M D
+                            ON D.STPN_CD = C.STPN_CD
+                           AND D.UP_STPN_CD = 'AF'
+                           AND D.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+                         INNER JOIN SC013M E
+                            ON E.PRD_ID = B.PRD_ID
+                           AND E.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+                         INNER JOIN RM471T F
+                            ON F.STPN_SEQ IN (15, 16)
+                           AND F.PRD_ID = C.PRD_ID
+                         INNER JOIN RM462T G
+                            ON G.MOB_DGR = A.MOB_DGR
+                           AND G.CLPN_CD = F.STPN_CD
+                           AND G.UP_CLPN_CD = A.CLPN_CD
+               )
+        ]]>
+    </select>
+    
+    <select id="selectSalePriceBoardList" parameterType="himart.mobile.admin.vo.SalePriceBoardVO" resultMap="salePriceBoard">
+        <![CDATA[
+        SELECT  *
+          FROM (
+                SELECT  A.*
+                      , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+                  FROM (
+                        SELECT  DISTINCT
+                                A.MOB_DGR
+                              , D.STPN_CD
+                              , D.STPN_NM
+                              , A.MKR_PRD_CD
+                              , E.SHO_PRC
+                              , F.STPN_CD AS CLPN_CD
+                              , (SELECT CLPN_NM FROM RM461M WHERE CLPN_CD = G.CLPN_CD) AS CLPN_CD_NM
+                              , A.SALE_PRC_11
+                              , A.SALE_PRC_16
+                              , A.SALE_PRC_17
+                              , A.SALE_PRC_19
+                              , A.SALE_PRC_22
+                              , A.SALE_PRC_24
+                              , A.SALE_PRC_25
+                          FROM (
+                                SELECT  A.MOB_DGR
+                                      , A.MKR_PRD_CD
+                                      , A.CLPN_CD
+                                      , SUM(DECODE(A.JN_CF_CD, '11', A.SALE_PRC, 0)) AS SALE_PRC_11
+                                      , SUM(DECODE(A.JN_CF_CD, '16', A.SALE_PRC, 0)) AS SALE_PRC_16
+                                      , SUM(DECODE(A.JN_CF_CD, '17', A.SALE_PRC, 0)) AS SALE_PRC_17
+                                      , SUM(DECODE(A.JN_CF_CD, '19', A.SALE_PRC, 0)) AS SALE_PRC_19
+                                      , SUM(DECODE(A.JN_CF_CD, '22', A.SALE_PRC, 0)) AS SALE_PRC_22
+                                      , SUM(DECODE(A.JN_CF_CD, '24', A.SALE_PRC, 0)) AS SALE_PRC_24
+                                      , SUM(DECODE(A.JN_CF_CD, '25', A.SALE_PRC, 0)) AS SALE_PRC_25
+                                  FROM  SC017M A
+                                 WHERE  1 = 1
+                                   AND  A.SBD_TYPE_CD = '00'
+                                   AND  A.SALE_PRC > 0
+                                   AND  A.MOB_DGR = #{mobDgr}
+                                   AND  A.MBCOM_CD = #{mbcomCd}
+        ]]>
+           <choose>
+           <when test='mbcomCd == "01"'>
+            <![CDATA[
+                                      AND  A.JN_CF_CD IN ('11', '16', '17', '19', '22', '24')
+        ]]>
+        </when>
+           <when test='mbcomCd == "02"'>
+        <![CDATA[
+                                      AND  A.JN_CF_CD IN ('11', '16', '19', '22', '24', '25')
+        ]]>
+        </when>
+           <when test='mbcomCd == "03"'>
+        <![CDATA[
+                                      AND  A.JN_CF_CD IN ('11', '16', '25')
+        ]]>
+        </when>
+           <when test='mbcomCd == "04"'>
+        <![CDATA[
+                                      AND  A.JN_CF_CD IN ('11', '24', '25')
+        ]]>
+        </when>
+        <otherwise>
+        <![CDATA[
+                                      AND  1 = 2
+        ]]>
+        </otherwise>
+           </choose>
+        <![CDATA[
+                                 GROUP BY A.MOB_DGR
+                                        , A.MKR_PRD_CD
+                                        , A.CLPN_CD
+                               ) A
+                                 INNER JOIN SC011M B
+                                    ON B.MKR_PRD_CD = A.MKR_PRD_CD
+                                 INNER JOIN RM471T C
+                                    ON C.STPN_SEQ NOT IN (15, 16)
+                                   AND C.PRD_ID = B.PRD_ID
+                                 INNER JOIN RM470M D
+                                    ON D.STPN_CD = C.STPN_CD
+                                   AND D.UP_STPN_CD = 'AF'
+                                   AND D.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+                                 INNER JOIN SC013M E
+                                    ON E.PRD_ID = B.PRD_ID
+                                   AND E.EFF_END_DT >= TO_CHAR(SYSDATE, 'YYYYMMDD')
+                                 INNER JOIN RM471T F
+                                    ON F.STPN_SEQ IN (15, 16)
+                                   AND F.PRD_ID = C.PRD_ID
+                                 INNER JOIN RM462T G
+                                    ON G.MOB_DGR = A.MOB_DGR
+                                   AND G.CLPN_CD = F.STPN_CD
+                                   AND G.UP_CLPN_CD = A.CLPN_CD
+                        ORDER  BY STPN_NM, MKR_PRD_CD, CLPN_CD
+                       ) A
+                )
+          WHERE  PAGE = #{pageNo}
+        ]]>
+    </select>
+
+    <update id="updateRecomHofficeSalePrc" parameterType="himart.mobile.admin.vo.RecomHofficeVO">
+        <![CDATA[
+        MERGE INTO  RM478T USING (
+                                  SELECT  '0000000' AS ORG_ID
+                                        , #{regDt} AS REG_DT
+                                        , (
+                                           SELECT LPAD(TO_CHAR(NVL(MAX(TO_NUMBER(SEQ)), 0) + 1), 4, '0')
+                                             FROM RM478T
+                                            WHERE ORG_ID = '0000000'
+                                              AND REG_DT = #{regDt}
+                                          ) AS SEQ
+                                        , #{mkrPrdCd} AS MKR_PRD_CD
+                                        , #{mbComCd} AS MBCOM_CD
+                                        , #{stpnCd} AS STPN_CD
+                                        , #{mobJnCfCd} AS MOB_JN_CF_CD
+                                        , #{salePrc} AS SALE_PRC
+                                        , TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS REG_DTM
+                                        , #{empNo} AS REGR_ID
+                                        , TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') AS UPD_DTM
+                                        , #{empNo} AS UPDR_ID
+                                    FROM DUAL
+                                 ) TEMP
+                              ON (
+                                  RM478T.ORG_ID = TEMP.ORG_ID AND
+                                  RM478T.REG_DT = TEMP.REG_DT AND
+                                  RM478T.MKR_PRD_CD = TEMP.MKR_PRD_CD AND
+                                  RM478T.MBCOM_CD = TEMP.MBCOM_CD AND
+                                  RM478T.STPN_CD = TEMP.STPN_CD AND
+                                  RM478T.MOB_JN_CF_CD = TEMP.MOB_JN_CF_CD
+                                 )
+        WHEN MATCHED THEN
+             UPDATE SET  SALE_PRC = TEMP.SALE_PRC
+                       , UPD_DTM = TEMP.UPD_DTM
+                       , UPDR_ID = TEMP.UPDR_ID
+        WHEN NOT MATCHED THEN
+             INSERT (
+                     ORG_ID, REG_DT, SEQ
+                   , MKR_PRD_CD, MBCOM_CD, STPN_CD, MOB_JN_CF_CD, SALE_PRC
+                   , REG_DTM, REGR_ID, UPD_DTM, UPDR_ID
+                    )
+             VALUES (
+                     TEMP.ORG_ID, TEMP.REG_DT, TEMP.SEQ
+                   , TEMP.MKR_PRD_CD, TEMP.MBCOM_CD, TEMP.STPN_CD, TEMP.MOB_JN_CF_CD, TEMP.SALE_PRC
+                   , TEMP.REG_DTM, TEMP.REGR_ID, TEMP.UPD_DTM, TEMP.UPDR_ID
+                    )
+         ]]>
+    </update>
+</mapper>

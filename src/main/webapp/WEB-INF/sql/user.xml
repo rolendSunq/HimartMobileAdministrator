@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="user">
+	<resultMap id="userInfo" type="himart.mobile.admin.vo.UserInfoVO">
+    	<result property="empNo" 		column="EMP_NO" />
+    	<result property="empKname" 	column="EMP_KNAME" />
+    	<result property="blongOrgNo" 	column="BLONG_ORG_NO" />
+    	<result property="orgNm" 		column="ORG_NM" />    	
+    	<result property="orgType" 		column="ORG_TYPE" />    	
+    	<result property="validPwd" 	column="VALID_PWD" />    	
+	</resultMap>
+																																																																																																															
+	<select id="selectUserInfo" parameterType="himart.mobile.admin.vo.UserInfoVO" resultMap="userInfo">
+	    <![CDATA[
+		SELECT  A.EMP_NO
+		      , A.EMP_KNAME
+		      , A.BLONG_ORG_NO
+		      , A.ORG_NM
+		      , B.ORG_TYPE
+		      , CASE WHEN #{pwd} = HI_AES256_DECRYPT(A.PWD) THEN 'Y'
+		             ELSE 'N'
+		        END AS VALID_PWD
+		  FROM  VCO_USERINFO A
+		      , VCO_ORGINFO B
+		 WHERE  A.BLONG_ORG_NO = B.ORG_NO
+		   AND  B.ORG_TYPE IN ('A1', 'C1')
+		   AND  A.EMP_NO = #{empNo}
+   		]]>
+	</select>
+</mapper>

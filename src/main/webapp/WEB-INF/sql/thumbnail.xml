@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="thumbnail">
+	<resultMap id="thumbnailUpload" type="himart.mobile.admin.vo.ThumbnailUploadVO">
+		<result property="imgCfCd" column="IMG_CF_CD" />
+		<result property="imgCfCdNm" column="IMG_CF_CD_NM" />
+        <result property="prdNicNm" column="PRD_NIC_NM" />
+        <result property="prdNicNmNm" column="PRD_NIC_NM_NM" />
+        <result property="accPrdId" column="ACC_PRD_ID" />
+        <result property="accPrdCd" column="ACC_PRD_CD" />
+        <result property="accPrdCdNm" column="ACC_PRD_CD_NM" />
+		<result property="imgPstCfCd" column="IMG_PST_CF_CD" />
+		<result property="imgPstCfCdNm" column="IMG_PST_CF_CD_NM" />
+		<result property="updDt" column="UPD_DT" />
+		<result property="imgOrigFileNm" column="IMG_ORIG_FILE_NM" />
+		<result property="imgSaveFileNm" column="IMG_SAVE_FILE_NM" />
+		<result property="imgSavePath" column="IMG_SAVE_PATH" />
+	</resultMap>
+	
+	<select id="selectImageUploadTotCount" parameterType="himart.mobile.admin.vo.ThumbnailUploadVO" resultType="java.lang.Integer">
+	    <![CDATA[
+		SELECT  COUNT(*)
+		  FROM  RM477T
+		 WHERE  IMG_CF_CD = #{imgCfCd}
+		    AND  PRD_NIC_NM  = '0000000'
+		    AND  IMG_PST_CF_CD IN ( '01', '02',  '03', '04',  '05' ) 
+        ]]>
+	</select>
+
+	<select id="selectImageUploadList" parameterType="himart.mobile.admin.vo.ThumbnailUploadVO" resultMap="thumbnailUpload">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  A.*
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (   
+						SELECT  A.IMG_CF_CD
+						      , DECODE(A.IMG_CF_CD, '1', '제품', '2', '카드할인', '3', '신상품', '4', '액세서리', '5', '본사' , '6', '지점', '7', '배경이미지', '8', '타이틀' ) AS IMG_CF_CD_NM
+						      , A.PRD_NIC_NM
+		]]>
+		<![CDATA[
+						      , C.STPN_NM AS PRD_NIC_NM_NM
+		]]>
+		<![CDATA[
+		                      , A.PRD_ID AS ACC_PRD_ID
+                              , D.PRD_CD AS ACC_PRD_CD
+                              , D.PRD_NM AS ACC_PRD_CD_NM
+						      , A.IMG_PST_CF_CD
+						      , B.CM_CD_NM AS IMG_PST_CF_CD_NM
+						      , TO_CHAR(TO_DATE(A.UPD_DTM, 'YYYYMMDDHH24MISS'), 'YYYY-MM-DD') AS UPD_DT
+						      , A.IMG_ORIG_FILE_NM
+						      , A.IMG_SAVE_FILE_NM
+						      , A.IMG_SAVE_PATH
+						  FROM  RM477T A
+						        LEFT OUTER JOIN CM401C B
+						                     ON B.CM_CLS_CD = 'RM0247'
+						                    AND B.CM_CD = A.IMG_PST_CF_CD
+		]]>
+		<![CDATA[
+					            LEFT OUTER JOIN RM470M C
+						                     ON C.STPN_CD = A.PRD_NIC_NM
+		]]>
+
+		<![CDATA[
+                                LEFT OUTER JOIN SC011M D
+                                             ON D.PRD_ID = A.PRD_ID
+		                 WHERE  A.IMG_CF_CD = #{imgCfCd}
+		]]>
+		<![CDATA[
+						 ORDER  BY A.PRD_NIC_NM
+						         , A.IMG_PST_CF_CD
+		               ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<update id="updateImageUpload" parameterType="himart.mobile.admin.vo.ThumbnailUploadVO">
+	    <![CDATA[
+		MERGE INTO RM477T A USING (
+		                           SELECT  #{imgCfCd} AS IMG_CF_CD
+		                                 , #{prdNicNm} AS PRD_NIC_NM
+                                         , #{accPrdId} AS PRD_ID
+                                         , #{imgPstCfCd} AS IMG_PST_CF_CD
+		                                 , #{imgOrigFileNm} AS IMG_ORIG_FILE_NM
+		                                 , #{imgSaveFileNm} AS IMG_SAVE_FILE_NM
+		                                 , #{imgSavePath} AS IMG_SAVE_PATH
+		                                 , #{updDt} AS REG_DTM
+		                                 , #{empNo} AS REGR_ID
+		                                 , #{updDt} AS UPD_DTM
+		                                 , #{empNo} AS UPDR_ID
+		                             FROM DUAL
+		                          ) B
+	                         ON (
+	                             A.IMG_CF_CD = B.IMG_CF_CD AND
+                                 A.PRD_NIC_NM = B.PRD_NIC_NM AND
+                                 A.PRD_ID = B.PRD_ID AND
+		                         A.IMG_PST_CF_CD = B.IMG_PST_CF_CD
+		                        )
+		WHEN MATCHED THEN 
+		     UPDATE SET  A.IMG_ORIG_FILE_NM = B.IMG_ORIG_FILE_NM
+		               , A.IMG_SAVE_FILE_NM = B.IMG_SAVE_FILE_NM
+		               , A.IMG_SAVE_PATH = B.IMG_SAVE_PATH
+		               , A.UPD_DTM = B.UPD_DTM
+		               , A.UPDR_ID = B.UPDR_ID
+		WHEN NOT MATCHED THEN 
+		     INSERT (
+		             IMG_CF_CD, PRD_NIC_NM, PRD_ID, IMG_PST_CF_CD,
+		             IMG_ORIG_FILE_NM, IMG_SAVE_FILE_NM, IMG_SAVE_PATH,
+		             REG_DTM, REGR_ID, UPD_DTM, UPDR_ID
+		            )
+		     VALUES (
+		             B.IMG_CF_CD, B.PRD_NIC_NM, B.PRD_ID, B.IMG_PST_CF_CD,
+		             B.IMG_ORIG_FILE_NM, B.IMG_SAVE_FILE_NM, B.IMG_SAVE_PATH,
+		             B.REG_DTM, B.REGR_ID, B.UPD_DTM, B.UPDR_ID
+		            ) 
+   		]]>
+	</update>
+
+	<delete id="deleteImageUpload" parameterType="himart.mobile.admin.vo.ThumbnailUploadVO">
+	    <![CDATA[
+		DELETE FROM RM477T
+		 WHERE IMG_CF_CD = #{imgCfCd}
+           AND PRD_NIC_NM = #{prdNicNm}
+           AND PRD_ID = #{accPrdId}
+		   AND IMG_PST_CF_CD = #{imgPstCfCd}
+  		]]>
+	</delete>
+
+	<select id="selectBackImgTotCount" parameterType="himart.mobile.admin.vo.ThumbnailUploadVO"
+		resultType="java.lang.Integer">
+	    <![CDATA[
+		SELECT  COUNT(*)
+		  FROM  RM477T
+		 WHERE  IMG_CF_CD = #{imgCfCd}
+		    AND  PRD_NIC_NM  = '0000000'
+        ]]>
+	</select>
+</mapper>

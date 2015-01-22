@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="log">
+	<resultMap id="LogCounsel" type="himart.mobile.admin.vo.LogCounselVO">
+		<result property="seq" column="SEQ" />
+		<result property="brchId" column="BRCH_ID" />
+		<result property="brchIdNm" column="BRCH_ID_NM" />
+		<result property="cnslDt" column="CNSL_DT" />
+		<result property="occrSeq" column="OCCR_SEQ" />
+		<result property="dtlSeq" column="DTL_SEQ" />
+		<result property="mnCfCd" column="MN_CF_CD" />
+		<result property="cnslStrtTm" column="CNSL_STRT_TM" />
+		<result property="ivtmnId" column="IVTMN_ID" />
+		<result property="ivtmnIdNm" column="IVTMN_ID_NM" />
+		<result property="ags" column="AGS" />
+		<result property="agsNm" column="AGS_NM" />
+		<result property="sexCd" column="SEX_CD" />
+		<result property="sexNm" column="SEX_NM" />
+		<result property="cnslPrdCd" column="CNSL_PRD_CD" />
+		<result property="cnslPrdCdNm" column="CNSL_PRD_CD_NM" />
+		<result property="mkrId" column="MKR_ID" />
+		<result property="mkrNm" column="MKR_NM" />
+		<result property="mbcomCd" column="MBCOM_CD" />
+		<result property="mbcomCdNm" column="MBCOM_CD_NM" />
+		<result property="cnslJnCfCd" column="CNSL_JN_CF_CD" />
+		<result property="cnslJnCfCdNm" column="CNSL_JN_CF_CD_NM" />
+		<result property="cnslSlprc" column="CNSL_SLPRC" />
+		<result property="hopeJnCfCd" column="HOPE_JN_CF_CD" />
+		<result property="hopeJnCfCdNm" column="HOPE_JN_CF_CD_NM" />
+		<result property="hopeSlprc" column="HOPE_SLPRC" />
+		<result property="clpnCd" column="CLPN_CD" />
+		<result property="clpnCdNm" column="CLPN_CD_NM" />
+		<result property="cpnAmt" column="CPN_AMT" />
+		<result property="dcSvCd" column="DC_SV_CD" />
+		<result property="dcSvCdNm" column="DC_SV_CD_NM" />
+		<result property="vndrId" column="VNDR_ID" />
+		<result property="vndrIdNm" column="VNDR_ID_NM" />
+		<result property="mbcomUcAmt" column="MBCOM_UC_AMT" />
+		<result property="brchDcAmt" column="BRCH_DC_AMT" />
+		<result property="wlfrDcCd" column="WLFR_DC_CD" />
+		<result property="wlfrDcCdNm" column="WLFR_DC_CD_NM" />
+		<result property="opsvcTsumAmt" column="OPSVC_TSUM_AMT" />
+		<result property="mobOpsvcCdNm" column="MOB_OPSVC_CD_NM" />
+		<result property="custNm" column="CUST_NM" />
+		<result property="mpno" column="MPNO" />
+		<result property="buyCfmDt" column="BUY_CFM_DT" />
+		<result property="cnslStsCd" column="CNSL_STS_CD" />
+		<result property="cnslStsCdNm" column="CNSL_STS_CD_NM" />
+		<result property="cnslPageUrl" column="CNSL_PAGE_URL" />
+		<result property="rmk" column="RMK" />
+        <result property="mnoBfMbcomCd" column="MNO_BF_MBCOM_CD" />
+        <result property="mnoBfMbcomCdNm" column="MNO_BF_MBCOM_CD_NM" />
+        <result property="mmPaidAmtBkdn" column="MM_PAID_AMT_BKDN" />
+        <result property="cnslPrdCd2" column="CNSL_PRD_CD_2" />
+        <result property="cnslPrdCdNm2" column="CNSL_PRD_CD_NM_2" />
+        <result property="clpnAgs" column="CLPN_AGS" />
+        <result property="clpnAgsNm" column="CLPN_AGS_NM" />
+	</resultMap>
+	
+	<select id="selectLogCounselTotCount" parameterType="himart.mobile.admin.vo.LogCounselVO" resultType="java.lang.Integer">
+	    <![CDATA[
+		SELECT COUNT(*)
+		  FROM (
+		        SELECT A.CNSL_PRD_CD
+		          FROM RM479T A
+		        WHERE 1 = 1
+		          AND A.CNSL_DT >= #{cnslDtFrom}
+		          AND A.CNSL_DT <= #{cnslDtTo}
+   		]]>
+		<if test='mbcomCd != null and mbcomCd != ""'>
+		<![CDATA[
+		          AND A.MBCOM_CD = #{mbcomCd}
+		]]>
+		</if>
+		<if test='cnslPrdCd != null and cnslPrdCd != ""'>
+		<![CDATA[
+		          AND A.CNSL_PRD_CD = #{cnslPrdCd}
+		]]>
+		</if>
+		<if test='brchId != null and brchId != ""'>
+		<![CDATA[
+		          AND A.BRCH_ID = #{brchId}
+		]]>
+		</if>
+		<if test='ivtmnId != null and ivtmnId != ""'>
+		<![CDATA[
+		          AND A.IVTMN_ID = #{ivtmnId}
+		]]>
+		</if>
+		<![CDATA[
+		       ) A
+		        LEFT OUTER JOIN SC011M E
+		                     ON E.PRD_CD = A.CNSL_PRD_CD
+		 WHERE 1 = 1
+   		]]>
+		<if test='mkrId != null and mkrId != ""'>
+		<![CDATA[
+		   AND E.MKR_ID = #{mkrId}
+		]]>
+		</if>
+	</select>
+
+	<select id="selectLogCounselViewList" parameterType="himart.mobile.admin.vo.LogCounselVO" resultMap="LogCounsel">
+	    <![CDATA[
+		SELECT  *
+		  FROM (
+		        SELECT  A.*
+		              , ROWNUM AS SEQ
+		              , FLOOR((ROWNUM-1)/#{pageSize}+1) AS PAGE
+		          FROM (   
+						SELECT A.*
+						    ,  B.ORG_NM AS BRCH_ID_NM
+						    ,  C.EMP_KNAME AS IVTMN_ID_NM
+						    ,  D.CM_CD_NM AS AGS_NM
+						    ,  E.PRD_NM AS CNSL_PRD_CD_NM
+						    ,  E.MKR_ID
+						    ,  DECODE(E.MKR_ID, '10127566', '팬택', F.VNDR_ABB_NM) AS MKR_NM
+						    ,  G.CM_CD_NM AS MBCOM_CD_NM
+						    ,  H.CM_CD_NM AS CNSL_JN_CF_CD_NM
+						    ,  I.CM_CD_NM AS HOPE_JN_CF_CD_NM
+						    ,  J.CLPN_NM AS CLPN_CD_NM
+						  FROM (
+						        SELECT A.BRCH_ID
+						            ,  A.CNSL_DT
+						            ,  A.OCCR_SEQ
+						            ,  A.DTL_SEQ
+						            ,  A.MN_CF_CD
+						            ,  A.CNSL_STRT_TM
+						            ,  A.IVTMN_ID
+						            ,  A.AGS
+						            ,  A.SEX_CD
+						            ,  DECODE(A.SEX_CD, '1', '남', '2', '여') AS SEX_NM
+						            ,  A.CNSL_PRD_CD
+						            ,  A.MBCOM_CD
+						            ,  A.CNSL_JN_CF_CD
+						            ,  A.CNSL_SLPRC
+						            ,  A.HOPE_JN_CF_CD
+						            ,  A.HOPE_SLPRC
+						            ,  A.CLPN_CD
+						          FROM RM479T A
+						        WHERE 1 = 1
+						          AND A.CNSL_DT >= #{cnslDtFrom}
+						          AND A.CNSL_DT <= #{cnslDtTo}
+   		]]>
+		<if test='mbcomCd != null and mbcomCd != ""'>
+		<![CDATA[
+						          AND A.MBCOM_CD = #{mbcomCd}
+		]]>
+		</if>
+		<if test='cnslPrdCd != null and cnslPrdCd != ""'>
+		<![CDATA[
+		        				  AND A.CNSL_PRD_CD = #{cnslPrdCd}
+		]]>
+		</if>
+		<if test='brchId != null and brchId != ""'>
+		<![CDATA[
+		          				  AND A.BRCH_ID = #{brchId}
+		]]>
+		</if>
+		<if test='ivtmnId != null and ivtmnId != ""'>
+		<![CDATA[
+						          AND A.IVTMN_ID = #{ivtmnId}
+		]]>
+		</if>
+		<![CDATA[
+						       ) A
+						        LEFT OUTER JOIN VCO_ORGINFO B
+						                     ON B.ORG_NO = A.BRCH_ID
+						        LEFT OUTER JOIN VCO_USERINFO C
+						                     ON C.EMP_NO = A.IVTMN_ID
+						        LEFT OUTER JOIN CM401C D
+						                     ON D.CM_CLS_CD = 'RM0238'
+						                    AND D.CM_CD = A.AGS
+						        LEFT OUTER JOIN SC011M E
+						                     ON E.PRD_CD = A.CNSL_PRD_CD
+						        LEFT OUTER JOIN CM101C F
+						                     ON F.VNDR_ID = E.MKR_ID
+						        LEFT OUTER JOIN CM401C G
+						                     ON G.CM_CLS_CD = 'RM0104'
+						                    AND G.CM_CD = A.MBCOM_CD
+						        LEFT OUTER JOIN CM401C H
+						                     ON H.CM_CLS_CD = 'SCP1'
+						                    AND H.CM_CD = A.CNSL_JN_CF_CD
+						        LEFT OUTER JOIN CM401C I
+						                     ON I.CM_CLS_CD = 'SCP1'
+						                    AND I.CM_CD = A.HOPE_JN_CF_CD
+						        LEFT OUTER JOIN RM461M J
+						                     ON J.CLPN_CD = A.CLPN_CD
+						 WHERE 1 = 1
+   		]]>
+		<if test='mkrId != null and mkrId != ""'>
+		<![CDATA[
+						   AND E.MKR_ID = #{mkrId}
+		]]>
+		</if>
+		<![CDATA[
+						 ORDER BY A.CNSL_DT, A.OCCR_SEQ, A.DTL_SEQ
+		               ) A
+		        )
+		  WHERE  PAGE = #{pageNo}
+   		]]>
+	</select>
+
+	<select id="selectLogCounselExcelList" parameterType="himart.mobile.admin.vo.LogCounselVO" resultMap="LogCounsel">
+	    <![CDATA[
+        SELECT ROWNUM AS SEQ
+            ,  A.*
+            ,  B.ORG_NM AS BRCH_ID_NM
+            ,  C.EMP_KNAME AS IVTMN_ID_NM
+            ,  D.CM_CD_NM AS AGS_NM
+            ,  E.PRD_NM AS CNSL_PRD_CD_NM
+            ,  E.MKR_ID
+            ,  DECODE(E.MKR_ID, '10127566', '팬택', F.VNDR_ABB_NM) AS MKR_NM
+            ,  G.CM_CD_NM AS MBCOM_CD_NM
+            ,  H.CM_CD_NM AS CNSL_JN_CF_CD_NM
+            ,  I.CM_CD_NM AS HOPE_JN_CF_CD_NM
+            ,  J.CLPN_NM AS CLPN_CD_NM
+            ,  K.CM_CD_NM AS DC_SV_CD_NM
+            ,  L.CM_CD_NM AS VNDR_ID_NM
+            ,  M.CM_CD_NM AS WLFR_DC_CD_NM
+        ,  N.CM_CD_NM AS MNO_BF_MBCOM_CD_NM
+        ,  O.PRD_NM AS CNSL_PRD_CD_NM_2
+        ,  P.CM_CD_NM AS CLPN_AGS_NM
+          FROM (
+                SELECT A.BRCH_ID
+                    ,  A.CNSL_DT
+                    ,  A.OCCR_SEQ
+                    ,  A.DTL_SEQ
+                    ,  A.MN_CF_CD
+                    ,  A.CNSL_STRT_TM
+                    ,  A.IVTMN_ID
+                    ,  A.AGS
+                    ,  A.SEX_CD
+                    ,  DECODE(A.SEX_CD, '1', '남', '2', '여') AS SEX_NM
+                    ,  A.CNSL_PRD_CD
+                    ,  A.MBCOM_CD
+                    ,  A.CNSL_JN_CF_CD
+                    ,  A.CNSL_SLPRC
+                    ,  A.HOPE_JN_CF_CD
+                    ,  A.HOPE_SLPRC
+                    ,  A.CLPN_CD
+                    ,  A.CPN_AMT
+                    ,  A.DC_SV_CD
+                    ,  A.VNDR_ID
+                    ,  A.MBCOM_UC_AMT
+                    ,  A.BRCH_DC_AMT
+                    ,  A.WLFR_DC_CD
+                    ,  A.OPSVC_TSUM_AMT
+                    ,  B.MOB_OPSVC_CD_NM
+                    ,  A.CUST_NM
+                    ,  A.MPNO
+                    ,  A.BUY_CFM_DT
+                    ,  A.CNSL_STS_CD
+                    ,  DECODE(A.CNSL_STS_CD, '1', '상담', '2', '구매', '3', '미구매') AS CNSL_STS_CD_NM
+                    ,  A.CNSL_PAGE_URL
+                    ,  A.RMK
+                    ,  A.MNO_BF_MBCOM_CD
+                    ,  A.MM_PAID_AMT_BKDN
+                    ,  A.CNSL_PRD_CD_2
+                    ,  A.CLPN_AGS
+                  FROM RM479T A
+                       LEFT OUTER JOIN (
+                                        SELECT B.BRCH_ID
+                                             , B.CNSL_DT
+                                             , B.OCCR_SEQ
+                                             , B.DTL_SEQ
+                                             , SUBSTR(XMLAGG(XMLELEMENT(CM_CD_NM, DECODE(C.CM_CD_NM, NULL, NULL, ', ' || C.CM_CD_NM))).EXTRACT('//text()').GETSTRINGVAL(), 2) AS MOB_OPSVC_CD_NM
+                                          FROM RM480T B
+                                               LEFT OUTER JOIN CM401C C
+                                                            ON C.CM_CLS_CD = 'RM0243'
+                                                           AND C.CM_CD = B.MOB_OPSVC_CD
+                                         GROUP BY B.BRCH_ID
+                                                , B.CNSL_DT
+                                                , B.OCCR_SEQ
+                                                , B.DTL_SEQ
+                                       ) B
+                                    ON B.BRCH_ID = A.BRCH_ID
+                                   AND B.CNSL_DT = A.CNSL_DT
+                                   AND B.OCCR_SEQ = A.OCCR_SEQ
+                                   AND B.DTL_SEQ = A.DTL_SEQ
+                WHERE 1 = 1
+		          AND A.CNSL_DT >= #{cnslDtFrom}
+		          AND A.CNSL_DT <= #{cnslDtTo}
+   		]]>
+		<if test='mbcomCd != null and mbcomCd != ""'>
+		<![CDATA[
+		          AND A.MBCOM_CD = #{mbcomCd}
+		]]>
+		</if>
+		<if test='cnslPrdCd != null and cnslPrdCd != ""'>
+		<![CDATA[
+				  AND A.CNSL_PRD_CD = #{cnslPrdCd}
+		]]>
+		</if>
+		<if test='brchId != null and brchId != ""'>
+		<![CDATA[
+				  AND A.BRCH_ID = #{brchId}
+		]]>
+		</if>
+		<if test='ivtmnId != null and ivtmnId != ""'>
+		<![CDATA[
+		          AND A.IVTMN_ID = #{ivtmnId}
+		]]>
+		</if>
+		<![CDATA[
+		       ) A
+		        LEFT OUTER JOIN VCO_ORGINFO B
+		                     ON B.ORG_NO = A.BRCH_ID
+		        LEFT OUTER JOIN VCO_USERINFO C
+		                     ON C.EMP_NO = A.IVTMN_ID
+		        LEFT OUTER JOIN CM401C D
+		                     ON D.CM_CLS_CD = 'RM0238'
+		                    AND D.CM_CD = A.AGS
+		        LEFT OUTER JOIN SC011M E
+		                     ON E.PRD_CD = A.CNSL_PRD_CD
+		        LEFT OUTER JOIN CM101C F
+		                     ON F.VNDR_ID = E.MKR_ID
+		        LEFT OUTER JOIN CM401C G
+		                     ON G.CM_CLS_CD = 'RM0104'
+		                    AND G.CM_CD = A.MBCOM_CD
+		        LEFT OUTER JOIN CM401C H
+		                     ON H.CM_CLS_CD = 'SCP1'
+		                    AND H.CM_CD = A.CNSL_JN_CF_CD
+		        LEFT OUTER JOIN CM401C I
+		                     ON I.CM_CLS_CD = 'SCP1'
+		                    AND I.CM_CD = A.HOPE_JN_CF_CD
+		        LEFT OUTER JOIN RM461M J
+		                     ON J.CLPN_CD = A.CLPN_CD
+		        LEFT OUTER JOIN CM401C K
+		                     ON K.CM_CLS_CD = 'RM0213'
+		                    AND K.CM_CD = A.DC_SV_CD
+		        LEFT OUTER JOIN CM401C L
+		                     ON L.CM_CLS_CD = 'RM0244'
+		                    AND L.CM_CD = A.VNDR_ID
+		        LEFT OUTER JOIN CM401C M
+		                     ON M.CM_CLS_CD = 'RM0246'
+		                    AND M.CM_CD = A.WLFR_DC_CD
+                LEFT OUTER JOIN CM401C N
+                             ON N.CM_CLS_CD = 'RM0104'
+                            AND N.CM_CD = A.MNO_BF_MBCOM_CD
+                LEFT OUTER JOIN SC011M O
+                             ON O.PRD_CD = A.CNSL_PRD_CD_2
+                LEFT OUTER JOIN CM401C P
+                             ON P.CM_CLS_CD = 'RM0238'
+                            AND P.CM_CD = A.CLPN_AGS
+		 WHERE 1 = 1
+   		]]>
+		<if test='mkrId != null and mkrId != ""'>
+		<![CDATA[
+		   AND E.MKR_ID = #{mkrId}
+		]]>
+		</if>
+		<![CDATA[
+		 ORDER BY A.CNSL_DT, A.OCCR_SEQ, A.DTL_SEQ
+   		]]>
+	</select>
+</mapper>
