@@ -293,7 +293,7 @@ co.popup = {
 
         // iframe이 존재하지 않으면 생성
         if ($("#popupDiv").length <= 0) {
-            $("body").append("<div id='popupDiv'><div id='title'><div id='titleText'></div><img id='closeIcon' src='/assets/image/icon_close_popup.png'/></div><iframe id='popupFrame' src='about:blank' frameborder='0'></iframe></div>");
+            $("body").append("<div id='popupDiv'><div id='title'><div id='titleText'></div><img id='closeIcon' src='/resources/assets/image/icon_close_popup.png'/></div><iframe id='popupFrame' src='about:blank' frameborder='0'></iframe></div>");
 
             $("#closeIcon").on("click", function() {
                 co.popup.close();

@@ -77,7 +77,7 @@
 					</c:if>
 				</tbody>
 			</table>
-			<page:paging pageSize="${pageSize}" pageNo="${pageNo}" totalCnt="${totalCnt}" pageCnt="5" urlImg="<%=request.getContextPath()%>/resources/assets/image/"></page:paging>
+			<page:paging pageSize="${pageSize}" pageNo="${pageNo}" totalCnt="${totalCnt}" pageCnt="5" urlImg="${pageContext.request.contextPath}/resources/assets/image/"></page:paging>
 		</div>
 	</div>
 </body>
