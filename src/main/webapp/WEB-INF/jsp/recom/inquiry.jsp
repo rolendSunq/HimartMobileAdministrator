@@ -173,9 +173,9 @@
 					</tbody>
 				</table>
 			</form>
-			<page:paging pageSize="${pageSize}" pageNo="${pageNo}" totalCnt="${totalCnt}" pageCnt="10" urlImg="<%=request.getContextPath()%>/resources/assets/image/"></page:paging>
+			<page:paging pageSize="${pageSize}" pageNo="${pageNo}" totalCnt="${totalCnt}" pageCnt="10" urlImg="${pageContext.request.contextPath}/resources/assets/image/"></page:paging>
 			<iframe id="frameProc" name="frameProc" class="proc_hidden"></iframe>
-			<div class="btn-right"><a href="#"><img id="btnSave" src="<%=request.getContextPath()%>/resources/assets/image/btn_save.gif" alt="저장" /></a></div>
+			<div class="btn-right"><a href="#"><img id="btnSave" src="${pageContext.request.contextPath}/resources/assets/image/btn_save.gif" alt="저장" /></a></div>
 		</div>
 	</div>
 </body>
