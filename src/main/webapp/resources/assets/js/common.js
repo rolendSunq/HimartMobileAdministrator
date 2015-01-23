@@ -395,7 +395,7 @@ co.popup = {
 co.loading = {
     init : function() {
         if ($("#loadingDiv").length <= 0) {
-            $("body").append("<div id='loadingDiv'><img src='/assets/image/loading.gif'/></div>");
+            $("body").append("<div id='loadingDiv'><img src='/resources/assets/image/loading.gif'/></div>");
         }
     },
     
