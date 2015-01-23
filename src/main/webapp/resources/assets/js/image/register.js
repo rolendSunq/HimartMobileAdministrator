@@ -52,15 +52,15 @@ function initialize() {
 		var newTr = "";
 
 		newTr += "<tr>";
-		newTr += "	<td class='txt_ac'><a href='#'><img src='/assets/image/btn_delrow.png' alt='삭제' title='삭제' onclick='javascript:deleteFile(this); return false;'/></a></td>";
+		newTr += "	<td class='txt_ac'><a href='#'><img src='/resources/assets/image/btn_delrow.png' alt='삭제' title='삭제' onclick='javascript:deleteFile(this); return false;'/></a></td>";
 		newTr += "	<td class='txt_ac'><input type='hidden' name='imgCfCd' value='" + imgCf + "' title='구분'/>" + imgCfNm + "</td>";
-        newTr += "  <td class='txt_ac'><input type='hidden' id='itemCdReg' value='" + itemCd + "' title='품목코드' /><input type='hidden' id='prdNicNm' name='prdNicNm' title='닉네임코드/대표코드' /><input type='text' class='wd201' id='prdNicNmNm' title='닉네임명' readonly='readonly' /><input type='image' class='icld' src='/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupNic(this); return false;' /></td>";
+        newTr += "  <td class='txt_ac'><input type='hidden' id='itemCdReg' value='" + itemCd + "' title='품목코드' /><input type='hidden' id='prdNicNm' name='prdNicNm' title='닉네임코드/대표코드' /><input type='text' class='wd201' id='prdNicNmNm' title='닉네임명' readonly='readonly' /><input type='image' class='icld' src='/resources/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupNic(this); return false;' /></td>";
         if (imgCf == "4") {
-        newTr += "  <td class='txt_ac'><input type='hidden' id='accPrdId' name='accPrdId' title='상품ID' /><input type='text' class='wd201' id='accPrdCdNm' title='닉네임명/대표코드' readonly='readonly' /><input type='image' class='icld' src='/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupAcc(this); return false;' /></td>";
+        newTr += "  <td class='txt_ac'><input type='hidden' id='accPrdId' name='accPrdId' title='상품ID' /><input type='text' class='wd201' id='accPrdCdNm' title='닉네임명/대표코드' readonly='readonly' /><input type='image' class='icld' src='/resources/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupAcc(this); return false;' /></td>";
         } else {
         newTr += "  <td class='txt_ac'><input type='hidden' id='accPrdId' name='accPrdId' title='상품ID' value='0000000000' /></td>";
         }
-		newTr += "	<td class='txt_ac'><input type='hidden' id='imgPstCfCd' name='imgPstCfCd' title='이미지구분코드' /><input type='text' class='wd101' id='imgPstCfCdNm' title='이미지구분명' readonly='readonly' /><input type='image' class='icld' src='/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupImgGb(this); return false;' /></td>";
+		newTr += "	<td class='txt_ac'><input type='hidden' id='imgPstCfCd' name='imgPstCfCd' title='이미지구분코드' /><input type='text' class='wd101' id='imgPstCfCdNm' title='이미지구분명' readonly='readonly' /><input type='image' class='icld' src='/resources/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupImgGb(this); return false;' /></td>";
 		newTr += "	<td class='txt_ac'><input type='hidden' id='imgOrigFileNm' title='파일명' /><input type='file' class='wdfull' id='imgOrigFile' name='imgOrigFile' accept='image/*' onchange='javascript:changeFile(this);' /></td>";
 		newTr += "</tr>";
 

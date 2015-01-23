@@ -82,6 +82,7 @@
                                          LEFT OUTER JOIN RM461M D
                                                       ON D.MBCOM_CD = A.MBCOM_CD
                                                      AND D.CLPN_CD = A.STPN_CD
+                                                     AND D.B2B_SALE_CF_CD = '1'
                          WHERE  1 = 1
                            AND  A.ORG_ID = '0000000'
                            AND  A.REG_DT = #{regDt}
@@ -121,40 +122,12 @@
 
     <select id="selectLastMobDgr" parameterType="himart.mobile.admin.vo.SalePriceBoardVO" resultType="java.lang.Integer">
         <![CDATA[
-        SELECT  NVL(MAX(MOB_DGR), -1) AS MOB_DGR
-          FROM  SC017M
-         WHERE  SBD_TYPE_CD = '00'
-           AND  SALE_PRC > 0
-           AND  MOB_DGR NOT IN (99)
-           AND  MBCOM_CD = #{mbcomCd}
+        SELECT MAX(MOB_DGR) MOB_DGR
+		  FROM RM460M 
+		 WHERE CFM_CD = '00' 
+		   AND (TO_CHAR(SYSDATE,'YYYYMMDD') BETWEEN EFF_STRT_DT AND EFF_END_DT)     
+		   AND CFM_YN = 'Y'
         ]]>
-           <choose>
-           <when test='mbcomCd == "01"'>
-        <![CDATA[
-              AND  JN_CF_CD IN ('11', '16', '17', '19', '22', '24')
-        ]]>
-        </when>
-           <when test='mbcomCd == "02"'>
-        <![CDATA[
-              AND  JN_CF_CD IN ('11', '16', '19', '22', '24', '25')
-        ]]>
-        </when>
-           <when test='mbcomCd == "03"'>
-        <![CDATA[
-              AND  JN_CF_CD IN ('11', '16', '25')
-        ]]>
-        </when>
-           <when test='mbcomCd == "04"'>
-        <![CDATA[
-              AND  JN_CF_CD IN ('11', '24', '25')
-        ]]>
-            </when>
-            <otherwise>
-        <![CDATA[
-              AND  1 = 2
-        ]]>
-            </otherwise>
-        </choose>
     </select>
 
     <select id="selectSalePriceBoardTotCount" parameterType="himart.mobile.admin.vo.SalePriceBoardVO" resultType="java.lang.Integer">
@@ -168,7 +141,7 @@
                       , A.MKR_PRD_CD
                       , E.SHO_PRC
                       , F.STPN_CD AS CLPN_CD
-                      , (SELECT CLPN_NM FROM RM461M WHERE CLPN_CD = G.CLPN_CD) AS CLPN_CD_NM
+                      , (SELECT CLPN_NM FROM RM461M WHERE CLPN_CD = G.CLPN_CD AND B2B_SALE_CF_CD = '1') AS CLPN_CD_NM
                       , A.SALE_PRC_11
                       , A.SALE_PRC_16
                       , A.SALE_PRC_17
@@ -245,6 +218,7 @@
                             ON G.MOB_DGR = A.MOB_DGR
                            AND G.CLPN_CD = F.STPN_CD
                            AND G.UP_CLPN_CD = A.CLPN_CD
+                           AND G.B2B_SALE_CF_CD = '1'
                )
         ]]>
     </select>
@@ -263,7 +237,7 @@
                               , A.MKR_PRD_CD
                               , E.SHO_PRC
                               , F.STPN_CD AS CLPN_CD
-                              , (SELECT CLPN_NM FROM RM461M WHERE CLPN_CD = G.CLPN_CD) AS CLPN_CD_NM
+                              , (SELECT CLPN_NM FROM RM461M WHERE CLPN_CD = G.CLPN_CD AND B2B_SALE_CF_CD = '1') AS CLPN_CD_NM
                               , A.SALE_PRC_11
                               , A.SALE_PRC_16
                               , A.SALE_PRC_17
@@ -340,6 +314,7 @@
                                     ON G.MOB_DGR = A.MOB_DGR
                                    AND G.CLPN_CD = F.STPN_CD
                                    AND G.UP_CLPN_CD = A.CLPN_CD
+                                   AND G.B2B_SALE_CF_CD = '1'
                         ORDER  BY STPN_NM, MKR_PRD_CD, CLPN_CD
                        ) A
                 )

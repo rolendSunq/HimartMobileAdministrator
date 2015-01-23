@@ -85,10 +85,10 @@ function initialize() {
 		var newTr = "";
 
 		newTr += "<tr>";
-		newTr += "	<td class='txt_ac'><a href='#'><img src='/assets/image/btn_delrow.png' alt='삭제' title='삭제' onclick='javascript:deleteFile(this); return false;'/></a></td>";
+		newTr += "	<td class='txt_ac'><a href='#'><img src='/resources/assets/image/btn_delrow.png' alt='삭제' title='삭제' onclick='javascript:deleteFile(this); return false;'/></a></td>";
 		newTr += "	<td class='txt_ac'><input type='hidden' name='imgCfCd' value='" + imgCf + "' title='구분'/>" + imgCfNm + "</td>";
         if (imgCf == "8") {
-        	 newTr += "  <td class='txt_ac'><input type='hidden' id='itemCdReg' value='" + itemCd + "' title='코드' /><input type='hidden' id='prdNicNm' name='prdNicNm' title='코드' /><input type='text' class='wd201' id='prdNicNmNm' title='코드명' readonly='readonly' /><input type='image' class='icld' src='/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupNic(this); return false;' /></td>";
+        	 newTr += "  <td class='txt_ac'><input type='hidden' id='itemCdReg' value='" + itemCd + "' title='코드' /><input type='hidden' id='prdNicNm' name='prdNicNm' title='코드' /><input type='text' class='wd201' id='prdNicNmNm' title='코드명' readonly='readonly' /><input type='image' class='icld' src='/resources/assets/image/btn_search.gif' alt='찾기' title='찾기' onclick='javascript:popupNic(this); return false;' /></td>";
         } else {
             newTr += "  <td class='txt_ac'><input type='hidden' id='itemCdReg' value='"+itemNicNm+"' title='코드' /><input type='hidden' id='prdNicNm' name='prdNicNm' title='코드' value='"+itemNicNm+"'  readonly='readonly' />"+itemNicNm+"</td>";
         }

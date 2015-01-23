@@ -52,7 +52,7 @@ input[type='file'] {background-color:#ffffff;}
 
 #container {position:absolute; top:0; right:0; bottom:0; left:0;}
 
-#headerWrap {overflow:hidden; width:100%; height:78px; padding-top:8px; background:url('/assets/image/top_line.gif') repeat-x left top;}
+#headerWrap {overflow:hidden; width:100%; height:78px; padding-top:8px; background:url('/resources/assets/image/top_line.gif') repeat-x left top;}
 #headerWrap h1 {float:left; margin:10px 0 0 21px;}
 #headerWrap .log-menu {float:right; margin-right:20px;}
 #headerWrap .log-menu .log {overflow:hidden; width:auto;}

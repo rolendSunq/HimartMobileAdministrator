@@ -187,6 +187,7 @@
 						                    AND I.CM_CD = A.HOPE_JN_CF_CD
 						        LEFT OUTER JOIN RM461M J
 						                     ON J.CLPN_CD = A.CLPN_CD
+						                    AND J.B2B_SALE_CF_CD = '1'
 						 WHERE 1 = 1
    		]]>
 		<if test='mkrId != null and mkrId != ""'>
@@ -327,6 +328,7 @@
 		                    AND I.CM_CD = A.HOPE_JN_CF_CD
 		        LEFT OUTER JOIN RM461M J
 		                     ON J.CLPN_CD = A.CLPN_CD
+		                    AND J.B2B_SALE_CF_CD = '1'
 		        LEFT OUTER JOIN CM401C K
 		                     ON K.CM_CLS_CD = 'RM0213'
 		                    AND K.CM_CD = A.DC_SV_CD
