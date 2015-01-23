@@ -388,17 +388,14 @@ public class RecomController {
 		try {
 			for (int i = 0; i < paramVO.getRegDt().length; i++) {
 				RecomHofficeVO vo = new RecomHofficeVO();
-
 				vo.setRegDt(paramVO.getRegDt()[i].replaceAll("[^0-9]", ""));
 				vo.setMkrPrdCd(paramVO.getMkrPrdCd()[i]);
 				vo.setMbComCd(paramVO.getMbcomCd()[i]);
 				vo.setStpnCd(paramVO.getClpnCd()[i]);
 				vo.setEmpNo(empNo);
-
 				if (!StringUtil.isNull(paramVO.getSalePrc11()[i]) && Integer.parseInt(paramVO.getSalePrc11()[i]) > 0) {
 					vo.setMobJnCfCd("11");
 					vo.setSalePrc(Integer.parseInt(paramVO.getSalePrc11()[i]));
-
 					if (recomHofficeDao.updateRecomHofficeSalePrc(vo) <= 0) {
 						throw new Exception("저장 중 오류가 발생하였습니다.");
 					}

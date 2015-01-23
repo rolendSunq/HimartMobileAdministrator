@@ -27,15 +27,10 @@
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 		in the /WEB-INF/views directory -->
-	<beans:bean id="bnViewResolver"
-		class="org.springframework.web.servlet.view.BeanNameViewResolver"
-		p:order="0" />
+	<beans:bean id="bnViewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0" />
 
-	<beans:bean id="viewResolver"
-		class="org.springframework.web.servlet.view.UrlBasedViewResolver"
-		p:order="1">
-		<beans:property name="viewClass"
-			value="org.springframework.web.servlet.view.JstlView" />
+	<beans:bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="1">
+		<beans:property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
 		<beans:property name="prefix" value="/WEB-INF/jsp/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
